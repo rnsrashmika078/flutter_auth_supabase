@@ -1,11 +1,7 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:superbase_auth/screens/home_screen.dart';
-import 'package:superbase_auth/screens/store.dart';
-import 'package:superbase_auth/services/auth.dart';
 import 'package:superbase_auth/services/crud.dart';
 
 void main() async {
