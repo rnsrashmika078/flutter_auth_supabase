@@ -1,10 +1,12 @@
 import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:superbase_auth/screens/home_screen.dart';
+import 'package:superbase_auth/screens/store.dart';
 import 'package:superbase_auth/services/auth.dart';
+import 'package:superbase_auth/services/crud.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,10 +16,19 @@ void main() async {
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
-  runApp(AuthApp());
+  runApp(MyApp());
 }
 
 final supabase = Supabase.instance.client;
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(home: AuthApp());
+  }
+}
 
 class AuthApp extends StatefulWidget {
   const AuthApp({super.key});
@@ -27,57 +38,30 @@ class AuthApp extends StatefulWidget {
 }
 
 class _AuthApp extends State<AuthApp> {
-  String? _userId;
+  Map<String, dynamic>? _authUserData;
   @override
   void initState() {
     super.initState();
-    supabase.auth.onAuthStateChange.listen((data) {
+    if (!mounted) return;
+
+    supabase.auth.onAuthStateChange.listen((data) async {
+      final user = data.session?.user;
+      final newUserData = data.session?.user.userMetadata;
       setState(() {
-        _userId = data.session?.user.id;
+        _authUserData = newUserData;
       });
+
+      if (data.event == AuthChangeEvent.signedIn && user != null) {
+        await insertData();
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(_userId ?? "Not Signed in!"),
-              SizedBox(
-                width: 200,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
-                      await nativeGoogleSignIn();
-                    } else {
-                      await supabase.auth.signInWithOAuth(OAuthProvider.google);
-                    }
-                  },
-                  child: Row(
-                    spacing: 10,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-
-                    children: [
-                      Image.asset(
-                        'assets/images/google.png',
-                        width: 25,
-                        height: 25,
-                      ),
-                      Text("Sign with Google"),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+    return Scaffold(
+      appBar: AppBar(title: Text("SUPABASE + FLUTTER")),
+      body: Center(child: HomeScreen(authUserData: _authUserData)),
     );
   }
 }
