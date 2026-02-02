@@ -48,7 +48,7 @@ class _AuthApp extends State<AuthApp> {
       });
 
       if (data.event == AuthChangeEvent.signedIn && user != null) {
-        await insertData();
+        await insertData(user.id);
       }
     });
   }

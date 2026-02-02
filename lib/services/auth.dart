@@ -1,4 +1,3 @@
-
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -33,7 +32,6 @@ Future<void> nativeGoogleSignIn() async {
 }
 
 Future<void> signOut() async {
-  // Sign out from Google
   final webClientId = dotenv.env['WEB_CLIENT_ID'];
   final iosClientId = dotenv.env['IOS_CLIENT_ID'];
   final googleSignIn = GoogleSignIn(
@@ -41,8 +39,6 @@ Future<void> signOut() async {
     serverClientId: webClientId,
   );
 
-  await googleSignIn.signOut(); // Just sign out, don't get authentication
-
-  // Sign out from Supabase
+  await googleSignIn.signOut();
   await supabase.auth.signOut();
 }

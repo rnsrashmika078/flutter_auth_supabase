@@ -41,10 +41,26 @@ class _StoreBody extends State<StoreBody> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.network(_authUserData?['dp'] ?? "", width: 100,height: 100,),
-          Text(_authUserData?['userId'].toString() ?? "NO DATA"),
+          _authUserData?['dp'] != null
+              ? Image.network(_authUserData?['dp'], width: 100, height: 100)
+              : Image.asset(
+                  "assets/images/google.png",
+                  width: 100,
+                  height: 100,
+                ),
+
+          Text(_authUserData?['user_id'].toString() ?? "NO DATA"),
           Text(_authUserData?['username'] ?? "NO DATA"),
           Text(_authUserData?['email'] ?? "NO DATA"),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyApp()),
+              );
+            },
+            child: Icon(Icons.arrow_back),
+          ),
         ],
       ),
     );
